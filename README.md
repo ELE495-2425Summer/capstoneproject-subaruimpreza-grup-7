@@ -49,11 +49,14 @@ To use the project, power on the Raspberry Pi and ensure it is connected to the 
 
 
 ## Acknowledgements
+Project Demo:
+[Youtube Link](https://youtu.be/RIr8JASv2A8)
+
 Contributors:
 
 - [Şakir Ahmet ARSLAN](https://github.com/Sakirahmet)
 - [Ali Murat BÜYÜKAŞIK](https://github.com/alimuratb)
-- [Yusuf Kaan ESER](https://github.com/user1)
+- [Yusuf Kaan ESER]((https://github.com/kaanjr)
 - [Güner Toprak KARAMAN](https://github.com/toprakkaraman)
 - [İbrahim SARI](https://github.com/ibrahimsari23)
 
