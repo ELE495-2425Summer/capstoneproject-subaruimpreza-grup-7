@@ -52,10 +52,14 @@ To use the project, power on the Raspberry Pi and ensure it is connected to the 
 Contributors:
 
 -[Şakir Ahmet ARSLAN](https://github.com/Sakirahmet)
+
 -[Ali Murat BÜYÜKAŞIK](https://github.com/alimuratb)
+
 -[Yusuf Kaan ESER](https://github.com/user1)
+
 -[Güner Toprak KARAMAN](https://github.com/toprakkaraman)
--İbrahim SARI](https://github.com/ibrahimsari23)
+
+-[İbrahim SARI](https://github.com/ibrahimsari23)
 
 - [Google Speech-to-Text (STT)](https://cloud.google.com/speech-to-text)
 - [OpenAI GPT-4.0 LLM](https://openai.com/gpt-4)
