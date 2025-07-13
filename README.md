@@ -57,6 +57,8 @@ Contributors:
 - [Güner Toprak KARAMAN](https://github.com/toprakkaraman)
 - [İbrahim SARI](https://github.com/ibrahimsari23)
 
+Tools:
+
 - [Google Speech-to-Text (STT)](https://cloud.google.com/speech-to-text)
 - [OpenAI GPT-4.0 LLM](https://openai.com/gpt-4)
 - [ElevenLabs Text-to-Speech (TTS)](https://www.elevenlabs.io)
