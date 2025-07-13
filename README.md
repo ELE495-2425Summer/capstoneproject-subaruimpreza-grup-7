@@ -3,6 +3,7 @@
 # Table of Contents
 - [Introduction](#introduction)
 - [Features](#features)
+- [Hardware](#Hardware)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Screenshots](#screenshots)
@@ -22,21 +23,22 @@ List the key features and functionalities of the project.
 - Real-time obstacle avoidance
 - User interface for live command and movement tracking
 
-## Installation
-Describe the steps required to install and set up the project. Include any prerequisites, dependencies, and commands needed to get the project running.
+## Hardware
+- Raspberry Pi 5 8 GB
+- BNO055 9 DOF Absolute Orientation IMU Fusion Breakout
+- 2 x HC-SR04 Ultrasonic Distance Sensor
+- L298N Motor Driver
+- 4 x 6 V DC Motor
+- UGreen 10 Ah Powerbank
+- 2 x 18650 3.7 V Battery
 
-```bash
-# Example commands
-git clone https://github.com/username/project-name.git
-cd project-name
-```
+## Installation
+Before running the project, all mechanical components (such as motors, wheels, sensors, and power connections) must be properly assembled and tested. Once the hardware setup is complete, the main.py script should be executed on the Raspberry Pi. After the script is launched, and the Raspberry Pi is connected to the same Wi-Fi network as the client device, the user can access the web-based interface. From the interface, the system can be started, and the vehicle becomes ready to receive and execute voice commands in real time.
 
 ## Usage
-Provide instructions and examples on how to use the project. Include code snippets or screenshots where applicable.
+To use the project, power on the Raspberry Pi and ensure it is connected to the same local network as the computer or mobile device. Access the web-based user interface by entering the Raspberry Pi's IP address in a browser. Through this interface, users can view the system status in real time and send voice commands, which are processed and executed by the autonomous mini vehicle.
 
 ## Screenshots
-You can see a sample screenshot of the user interface below.
-
 <img width="1595" height="749" alt="image" src="https://github.com/user-attachments/assets/9323bd37-8db4-4535-8212-ae31ce3dc8ad" />
 
 - Vehicle Icon (top-center) – Rotates in real time to match the issued command, providing full-angle orientation feedback.
@@ -47,7 +49,15 @@ You can see a sample screenshot of the user interface below.
 
 
 ## Acknowledgements
-Give credit to those who have contributed to the project or provided inspiration. Include links to any resources or tools used in the project.
+Contributors:
 
-[Contributor 1](https://github.com/user1)
-[Resource or Tool](https://www.nvidia.com)
+-[Şakir Ahmet ARSLAN](https://github.com/Sakirahmet)
+-[Ali Murat BÜYÜKAŞIK](https://github.com/alimuratb)
+-[Yusuf Kaan ESER](https://github.com/user1)
+-[Güner Toprak KARAMAN](https://github.com/toprakkaraman)
+-İbrahim SARI](https://github.com/ibrahimsari23)
+
+- [Google Speech-to-Text (STT)](https://cloud.google.com/speech-to-text)
+- [OpenAI GPT-4.0 LLM](https://openai.com/gpt-4)
+- [ElevenLabs Text-to-Speech (TTS)](https://www.elevenlabs.io)
+
