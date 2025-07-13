@@ -56,7 +56,7 @@ Contributors:
 
 - [Şakir Ahmet ARSLAN](https://github.com/Sakirahmet)
 - [Ali Murat BÜYÜKAŞIK](https://github.com/alimuratb)
-- [Yusuf Kaan ESER]((https://github.com/kaanjr)
+- [Yusuf Kaan ESER](https://github.com/kaanjr)
 - [Güner Toprak KARAMAN](https://github.com/toprakkaraman)
 - [İbrahim SARI](https://github.com/ibrahimsari23)
 
