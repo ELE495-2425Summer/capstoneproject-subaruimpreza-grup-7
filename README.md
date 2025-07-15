@@ -8,6 +8,7 @@
 - [Usage](#usage)
 - [Screenshots](#screenshots)
 - [Acknowledgements](#acknowledgements)
+- [Photographs](#Photographs)
 
 ## Introduction
 In this project, Turkish spoken natural-language commands are first converted to text through an online Speech-to-Text service. The resulting text is then analyzed by a Large Language Model (LLM), which maps each command—via a dedicated algorithm—to basic motion functions. The action being executed is reported back to the user in real time through an online Text-to-Speech service.
@@ -47,10 +48,17 @@ To use the project, power on the Raspberry Pi and ensure it is connected to the 
 - Task History – Shows the commands that have been successfully completed.
 - Real-Time Vehicle Status – Presents the vehicle’s current movement state to the user.
 
+## Photographs
+
+![Araba 3](https://github.com/user-attachments/assets/327afb23-8906-4366-96a4-7ef78f7bb217)
+![Araba 2](https://github.com/user-attachments/assets/df1898ba-6785-4c53-8040-65b201b2ba9f)
+![Araba 1](https://github.com/user-attachments/assets/28df39f4-b11a-4b1c-99ff-fce9349e41e0)
+
+
 
 ## Acknowledgements
 Project Demo:
-[Youtube Link](https://youtu.be/RIr8JASv2A8)
+- [Youtube Link](https://youtu.be/RIr8JASv2A8)
 
 Contributors:
 
