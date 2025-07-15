@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sesli Komutlu Araç Kontrol Paneli</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+<style>
+    body {
+      background: url('./images/background.png') no-repeat center center fixed;
+      background-size: cover;
+    }
+    @keyframes pulse {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    #logo-animation {
+      position: fixed; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 50;
+      background: radial-gradient(circle at center, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 60%), rgba(10,25,50,0.7);
+      opacity: 1; transition: opacity 0.5s ease;
+    }
+    #logo-animation img {
+      height: 12rem; width: auto;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    #corner-logo {
+      position: fixed; top: 1rem; right: 1rem;
+      z-index: 40; height: 3rem; opacity: 0.8;
+      display: none;
+    }
+    #main-header {
+      display: none; text-align: center;
+      margin-top: 1rem; z-index: 30;
+    }
+    #main-header h1 {
+      font-size: 1.875rem; font-weight: 700;
+      color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+    #main-content {
+      display: none; padding: 1.5rem;
+      margin-top: 4rem; flex-direction: column;
+      gap: 1.5rem;
+    }
+    #direction-display {
+      position: relative; width: 200px;
+      height: 200px; margin: 2rem auto;
+    }
+    #direction-display::before {
+      content: ''; position: absolute; inset: 0;
+      border: 2px solid rgba(255,255,255,0.8);
+      border-radius: 50%; z-index: 1;
+    }
+    #car-icon {
+      position: absolute; top: 50%; left: 50%;
+      width: 200px; height: auto;
+      transform: translate(-50%, -50%) rotate(0deg);
+      transition: transform 0.3s ease; z-index: 2;
+    }
+    .panel {
+      background: rgba(255,255,255,0.85);
+      border-radius: 0.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 1rem;
+    }
+    .panel h2 {
+      font-size: 1.25rem; font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .panel p {
+      color: #374151; white-space: pre-line;
+    }
+    .speaker-tag {
+      display: inline-block;
+      background-color: #3B82F6;
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+      margin-right: 0.5rem;
+    }
+    .system-btn {
+      transition: all 0.2s ease;
+    }
+    .system-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+    #gyro-status {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      z-index: 40;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: #ef4444;
+      box-shadow: 0 0 5px rgba(0,0,0,0.3);
+      transition: background-color 0.3s ease;
+    }
+    #gyro-status.connected {
+      background-color: #10b981;
+    }
+    #gyro-status::after {
+      content: 'Sistem';
+      position: absolute;
+      left: 32px;
+      top: 0px;
+      white-space: nowrap;
+      color: white;
+      font-size: 24px;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    }
+  </style>
+</head>
+<body>
+<!-- Gyro Bağlantı Durum Göstergesi -->
+<div id="gyro-status"></div>
+
+<div id="logo-animation">
+<img alt="TOBB ETÜ Logo" src="./images/tobb-etu-logo.png"/>
+</div>
+<img alt="TOBB ETÜ Logo" id="corner-logo" src="./images/tobb-etu-kucuk-logo.png"/>
+<div id="main-header">
+<h1>Sesli Komutlu Araç Kontrol Paneli</h1>
+</div>
+<div id="main-content">
+<div id="direction-display">
+<img alt="Araç" id="car-icon" src="./images/car-icon.png"/>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+<section class="panel" id="vehicle-status">
+<h2>Gerçek Zamanlı Araç Durumu</h2>
+<p id="active-command">Beklemede...</p>
+</section>
+<section class="panel" id="commands">
+<h2>Komutlar</h2>
+<ul class="text-gray-700 list-none pl-0" id="commands-list">
+<li>Komut bekleniyor...</li>
+</ul>
+</section>
+<section class="panel" id="task-history">
+<h2>Görev Geçmişi</h2>
+<ul class="text-gray-700 list-none pl-0" id="history-list">
+<li>Veri bekleniyor...</li>
+</ul>
+</section>
+<section class="panel" id="speech-output">
+  <h2>Ses Tanıma Çıktısı</h2>
+  <div class="mb-2">
+    <span class="speaker-tag" id="current-speaker">Bilinmiyor</span>
+    <span id="speech-output-text">Sesli komut bekleniyor...</span>
+  </div>
+</section>
+<section id="system-controls" class="panel">
+  <h2>Sistem Kontrolleri</h2>
+  <div class="grid cols-2 gap-2">
+    <button onclick="sistemiBaslat()" id="start-btn" class="system-btn bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
+      Başlat
+    </button>
+    <button onclick="sistemiDurdur()" id="stop-btn" class="system-btn bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
+      Durdur
+    </button>
+</section>
+  <section id="system-controls" class="panel">
+  <h2>Sistem Kontrolleri</h2>
+  <div class="grid cols-2 gap-2">
+     <button onclick="sistemiDevamEttir()" id="resume-btn" class="system-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+      ▶ Devam
+    </button>
+    <button onclick="sistemiDuraklat()" id="pause-btn" class="system-btn bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded">
+      ⏸ Duraklat
+    </button>
+  </div>
+  <p id="system-feedback" class="text-sm text-gray-600 mt-2"></p>
+</section>
+</div>
+</div>
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    const logoAnim = document.getElementById('logo-animation');
+    const header = document.getElementById('main-header');
+    const content = document.getElementById('main-content');
+    const corner = document.getElementById('corner-logo');
+    const vehicleStatusEl = document.getElementById('active-command');
+    const commandsListEl = document.getElementById('commands-list');
+    const taskHistoryListEl = document.getElementById('history-list');
+    const speechOutputEl = document.getElementById('speech-output-text');
+    const currentSpeakerEl = document.getElementById('current-speaker');
+    const systemFeedbackEl = document.getElementById('system-feedback');
+    const gyroStatusEl = document.getElementById('gyro-status');
+
+    let gorevSayaci = 0;
+    const gorevGecmisi = [];
+
+    let sonKomutMetni = "";
+    let sonKomutZamani = 0;
+    let sonKonusmaZamani = null;
+    let sonKonusmaci = "Bilinmiyor";
+    let gyroTimeout;
+
+    const komutCevir = {
+      "ileri_git": "İleri git",
+      "geri_git": "Geri git",
+      "saga_don": "Sağa dön",
+      "sola_don": "Sola dön",
+      "dur": "Dur",
+      "tanimsiz_komut": "Tanımsız komut"
+    };
+
+    // Giriş animasyonu
+    setTimeout(() => {
+      logoAnim.style.opacity = '0';
+      setTimeout(() => {
+        logoAnim.style.display = 'none';
+        header.style.display = 'block';
+        content.style.display = 'flex';
+        corner.style.display = 'block';
+      }, 500);
+    }, 1000);
+
+    let currentAngle = 0;
+
+    // Konuşmacı bilgisini güncelle
+    function konusmaciGuncelle(konusmaci) {
+      sonKonusmaci = konusmaci || "Bilinmiyor";
+      currentSpeakerEl.innerText = sonKonusmaci;
+      
+      // Konuşmacı etiketini renklendir
+      if (sonKonusmaci === "tanimsiz_konusmaci") {
+        currentSpeakerEl.style.backgroundColor = "#EF4444";
+      } else {
+        currentSpeakerEl.style.backgroundColor = "#3B82F6";
+      }
+    }
+
+    // Gyro bağlantı durumunu güncelle
+    function gyroBaglantiGuncelle(bagli) {
+      clearTimeout(gyroTimeout);
+      if (bagli) {
+        gyroStatusEl.classList.add('connected');
+        // 2 saniye sonra bağlantıyı kontrol et
+        gyroTimeout = setTimeout(() => {
+          gyroStatusEl.classList.remove('connected');
+        }, 2000);
+      } else {
+        gyroStatusEl.classList.remove('connected');
+      }
+    }
+
+    // GYRO WebSocket
+    const gyroWs = new WebSocket('ws://172.20.10.2:5680');
+    gyroWs.addEventListener('open', () => {
+      console.log('GYRO WebSocket bağlantısı açıldı');
+    });
+    
+    gyroWs.addEventListener('message', e => {
+      try {
+        const msg = JSON.parse(e.data);
+        if (typeof msg.angle === 'number') {
+          setDirection(msg.angle);
+          gyroBaglantiGuncelle(true);
+        }
+      } catch (err) {
+        console.error('Gyro mesaj hatası:', err);
+      }
+    });
+
+    gyroWs.addEventListener('close', () => {
+      console.log('GYRO WebSocket bağlantısı kapandı');
+      gyroBaglantiGuncelle(false);
+    });
+
+    gyroWs.addEventListener('error', (err) => {
+      console.error('GYRO WebSocket hatası:', err);
+      gyroBaglantiGuncelle(false);
+    });
+
+    // STT WebSocket
+    const sttWs = new WebSocket('ws://172.20.10.2:5679');
+    sttWs.addEventListener('message', e => {
+      try {
+        const data = JSON.parse(e.data);
+        
+        // Konuşmacı bilgisini güncelle
+        if (data.speaker) {
+          konusmaciGuncelle(data.speaker);
+        }
+        
+        // Metin bilgisini güncelle
+        if (data.text) {
+          speechOutputEl.innerText = data.text;
+        }
+      } catch (err) {
+        console.error('STT mesaj hatası:', err);
+      }
+    });
+
+    // Status WebSocket
+    const statusWs = new WebSocket('ws://172.20.10.2:5678');
+    statusWs.addEventListener('message', async e => {
+      const data = await (e.data instanceof Blob ? e.data.text() : String(e.data));
+      try {
+        const parsed = JSON.parse(data);
+
+        if (parsed.status === "komut_listesi" && Array.isArray(parsed.komutlar)) {
+          const komutlar = parsed.komutlar.map(k => k.komut);
+          const komutMetni = komutlar.join(" / ");
+          const suan = Date.now();
+
+          // Konuşmacı bilgisini güncelle
+          if (parsed.konusmaci) {
+            konusmaciGuncelle(parsed.konusmaci);
+          }
+
+          // Komutlar panelini güncelle
+          commandsListEl.innerHTML = komutlar.map(k => 
+            `<li><span class="speaker-tag">${sonKonusmaci}</span> ${komutCevir[k] || k}</li>`
+          ).join('');
+
+          // tekrar mesaj filtresi
+          if (parsed.zaman && parsed.zaman !== sonKonusmaZamani) {
+            sonKonusmaZamani = parsed.zaman;
+          } else if (komutMetni === sonKomutMetni && suan - sonKomutZamani < 1000) {
+            return;
+          }
+
+          // Görev geçmişi güncelle
+          gorevSayaci++;
+          const cevrilmis = komutlar.map(k => komutCevir[k] || k).join(" / ");
+          
+          gorevGecmisi.unshift(`
+            <li class="mb-2">
+              <div class="flex items-start">
+                <span class="speaker-tag">${sonKonusmaci}</span>
+                <div>
+                  <div class="font-medium">Görev ${gorevSayaci}: ${cevrilmis}</div>
+                  <div class="text-xs text-gray-500">${new Date().toLocaleTimeString()}</div>
+                </div>
+              </div>
+            </li>
+          `);
+          
+          if (gorevGecmisi.length > 5) gorevGecmisi.pop();
+          taskHistoryListEl.innerHTML = gorevGecmisi.join('');
+
+          sonKomutMetni = komutMetni;
+          sonKomutZamani = suan;
+          return;
+        }
+
+        if (parsed.status === "aktif_komut" && parsed.mesaj) {
+          vehicleStatusEl.innerHTML = `
+            <div class="flex items-center">
+              <span class="speaker-tag">${sonKonusmaci}</span>
+              <span>${parsed.mesaj}</span>
+            </div>
+          `;
+          return;
+        }
+
+        if (parsed.status === "tamamlandi") {
+          vehicleStatusEl.innerHTML = `
+            <div class="flex items-center">
+              <span class="speaker-tag">${sonKonusmaci}</span>
+              <span>Verilen komut gerçekleştirildi.</span>
+            </div>
+          `;
+          return;
+        }
+
+      } catch (err) {
+        vehicleStatusEl.innerText = data;
+      }
+    });
+
+    function setDirection(newAngle) {
+      const last360 = currentAngle % 360;
+      let delta = newAngle - last360;
+      if (delta > 180) delta -= 360;
+      if (delta < -180) delta += 360;
+      currentAngle += delta;
+      const car = document.getElementById('car-icon');
+      car.style.transform = `translate(-50%, -50%) rotate(${currentAngle}deg)`;
+    }
+  });
+
+  const piIp = "http://172.20.10.2:5000";
+
+  function sistemiBaslat() {
+    fetch(`${piIp}/baslat`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP hatası! Durum: ${response.status}`);
+        }
+        return response.json().catch(() => {
+          return { mesaj: "Sistem başlatıldı (JSON yanıtı yok)" };
+        });
+      })
+      .then(data => {
+        document.getElementById('system-feedback').innerText = data.mesaj || "Sistem başlatıldı.";
+        setTimeout(() => {
+          location.reload();
+        }, 100);
+      })
+      .catch(error => {
+        console.error("Başlatma hatası:", error);
+        document.getElementById('system-feedback').innerText = "Başlatma hatası: " + error.message;
+        setTimeout(() => {
+          location.reload();
+        }, 500);
+      });
+  }
+
+  function sistemiDurdur() {
+    fetch(`${piIp}/durdur`)
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('system-feedback').innerText = data.mesaj || "Sistem durduruldu";
+      })
+      .catch(error => {
+        console.error("Durdurma hatası:", error);
+        document.getElementById('system-feedback').innerText = "Durdurma hatası: " + error.message;
+      });
+  }
+
+  function sistemiDuraklat() {
+    fetch(`${piIp}/duraklat`)
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('system-feedback').innerText = data.mesaj || "Sistem duraklatıldı";
+      })
+      .catch(error => {
+        console.error("Duraklatma hatası:", error);
+        document.getElementById('system-feedback').innerText = "Duraklatma hatası: " + error.message;
+      });
+  }
+
+  function sistemiDevamEttir() {
+    fetch(`${piIp}/devam`)
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('system-feedback').innerText = data.mesaj || "Sistem devam ediyor";
+      })
+      .catch(error => {
+        console.error("Devam ettirme hatası:", error);
+        document.getElementById('system-feedback').innerText = "Devam ettirme hatası: " + error.message;
+      });
+  }
+
+  window.sistemiBaslat = sistemiBaslat;
+  window.sistemiDurdur = sistemiDurdur;
+  window.sistemiDuraklat = sistemiDuraklat;
+  window.sistemiDevamEttir = sistemiDevamEttir;
+</script>
+</body>
+</html>
